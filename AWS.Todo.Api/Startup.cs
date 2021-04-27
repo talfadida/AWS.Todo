@@ -37,14 +37,10 @@ namespace Aws.Todo.Api
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
             app.UseOpenApi();
             app.UseSwaggerUi3();
-
 
             app.UseEndpoints(endpoints =>
             {

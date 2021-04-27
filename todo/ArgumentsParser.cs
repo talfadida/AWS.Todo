@@ -27,18 +27,18 @@ namespace todo
                 switch (args[1])
                 {
                     case "add-task":
-                        return new TodoCommand() { Operation = EnumOperation.Add,  Title = args[2], IsCompleted = false };
+                        return new TodoCommand() { Operation = EnumOperation.Add,  Title = CleanQuotes(args[2]), IsCompleted = false };
                     case "update-task":
-                        return new TodoCommand() { Operation = EnumOperation.Update, Title = args[2], NewTitle = args[3] };
+                        return new TodoCommand() { Operation = EnumOperation.Update, Title = CleanQuotes(args[2]), NewTitle = CleanQuotes(args[3]) };
                     case "complete-task":
-                        return new TodoCommand() { Operation = EnumOperation.Complete, IsCompleted = true, Title = args[2] };
+                        return new TodoCommand() { Operation = EnumOperation.Complete, IsCompleted = true, Title = CleanQuotes(args[2]) };
                     case "undo-task":
-                        return new TodoCommand() { Operation = EnumOperation.Undo, IsCompleted = false, Title = args[2] };
+                        return new TodoCommand() { Operation = EnumOperation.Undo, IsCompleted = false, Title = CleanQuotes(args[2]) };
                     case "delete-task":
-                        return new TodoCommand() { Operation = EnumOperation.Delete, Title = args[2] };
-                    case "list-task":
+                        return new TodoCommand() { Operation = EnumOperation.Delete, Title = CleanQuotes(args[2]) };
+                    case "list-tasks":
                         return new TodoCommand() { Operation = EnumOperation.List };
-                    case "list-completed-task":
+                    case "list-completed-tasks":
                         return new TodoCommand() { Operation = EnumOperation.ListCompleted };
                 }
             }
@@ -47,6 +47,13 @@ namespace todo
                //wrong usage
             }
             return null;
+        }
+
+        private static string CleanQuotes(string str)
+        {
+            if (str.StartsWith("\"") && str.EndsWith("\""))
+                return str.Substring(1, str.Length - 2);
+            return str;
         }
 
         public static void PrintHelp()

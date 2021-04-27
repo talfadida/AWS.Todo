@@ -28,43 +28,52 @@ namespace todo
         }
 
         private static bool cfgDebug;
+
+        private static HttpClient httpClient = new HttpClient();
+        private static string server_url;
+
         static async Task Main(string[] args)
         {
-
+             
             ServiceCollection serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
+            server_url = configuration.GetSection("Settings")["Url"];
             bool.TryParse(configuration.GetSection("Settings")["Debug"], out cfgDebug);
 
-            var command = ArgumentsParser.ParseArgs(args);
-            if (command == null)
-            {
-                ArgumentsParser.PrintHelp();
-                return;
-            }             
-            await ExecuteTodoOperation(command);
 
+            Console.WriteLine("Welcome to Todo app\r\n");
+            ArgumentsParser.PrintHelp();
+            while (true)
+            {               
+                Console.Write("> ");
+                string line = Console.ReadLine();
+
+                var command = ArgumentsParser.ParseArgs(line);
+                if (command == null)
+                {
+                    ArgumentsParser.PrintHelp();
+                    continue;
+                }
+                await ExecuteTodoOperation(command);
+            }
+                        
         }
 
       
         private static async Task ExecuteTodoOperation(TodoCommand cmd)
-        {
-            string server_url = configuration.GetSection("Settings")["Url"];  
-            using (HttpClient httpClient = new HttpClient())
-            {
+        {     
                
-                PrintDebug($"Sending operation {cmd.Operation} for {cmd.Title}");
+            PrintDebug($"Sending operation {cmd.Operation} for {cmd.Title}");
 
-                HttpContent content = new StringContent(JsonConvert.SerializeObject(cmd), Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync(server_url, content);              
-                var bodyOfResponse = await response.Content.ReadAsStringAsync();
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(cmd), Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(server_url, content);              
+            var bodyOfResponse = await response.Content.ReadAsStringAsync();
 
-                PrintDebug(bodyOfResponse);
+            PrintDebug(bodyOfResponse);
                 
-                var todoResponse = JsonConvert.DeserializeObject<TodoResponse>(bodyOfResponse);
-                todoResponse.WriteToConsole();
-
-                 
-            }
+            var todoResponse = JsonConvert.DeserializeObject<TodoResponse>(bodyOfResponse);
+            todoResponse.WriteToConsole();                            
+            
         }
 
         private static void PrintDebug(string str)
@@ -74,42 +83,6 @@ namespace todo
                 Console.WriteLine(str);
             }                
         }
-
-
-        static async Task RunTestInternal()
-        {
-            Console.WriteLine("Press any key when you ready");
-            Console.ReadKey();
-            List<string[]> inputs = new List<string[]>()
-            {
-                new[]{"list-task"},
-                new[]{"add-task", "have something to do"},
-                new[]{"add-task", "by dring"},
-                new[]{"list-completed-task"},
-                new[]{"add-task", "by dring"},
-                new[]{"update-task", "by dring", "by drink and food"},
-                new[]{"list-task"},
-                new[]{"complete-task", "have something to do"},
-                new[]{"list-task"},
-                new[]{"delete-task", "by drink and food"},
-                new[]{"delete-task", "by drink and food"},
-                new[]{"list-task"},
-                new[]{"add-task", "by drink and food"},
-                new[]{"list-task"},
-            };
-
-            foreach (var input in inputs)
-            {
-                var command = ArgumentsParser.ParseArgs(input);
-                if (command == null)
-                {
-                    ArgumentsParser.PrintHelp();
-                    return;
-                }
-                Console.WriteLine("> todo " + string.Join(" ", input));
-                await ExecuteTodoOperation(command);
-            }
-        }
-
+         
     }
 }

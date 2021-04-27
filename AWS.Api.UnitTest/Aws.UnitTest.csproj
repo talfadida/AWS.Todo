@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aws.Todo.Api\Aws.Todo.Api.csproj" />
+    <ProjectReference Include="..\Aws.Todo.Core\Aws.Todo.Core.csproj" />
     <ProjectReference Include="..\Aws.Todo.Model\Aws.Todo.Model.csproj" />
-    <ProjectReference Include="..\Aws.Todo.Processor\Aws.Todo.Core.csproj" />
   </ItemGroup>
 
 </Project>

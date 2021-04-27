@@ -9,9 +9,7 @@ using System.Collections.Generic;
 
 namespace Aws.Api.UnitTest
 {
-
-
-
+     
     public class TodoProcessor_Tests
     {
         Mock<IRepository> repo;

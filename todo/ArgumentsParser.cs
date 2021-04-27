@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using Aws.Todo.Model;
 
 namespace todo
@@ -9,25 +10,32 @@ namespace todo
     {
         
 
-        public static TodoCommand ParseArgs(string[] args)
+        public static TodoCommand ParseArgs(string line)
         {
             try
             {
-                if (args.Length == 0)
+                List<string> args = new List<string>();
+                Regex regex = new Regex(@"(""[^""]+"")|\S+");
+                foreach (var match in regex.Matches(line))
+                    args.Add(match.ToString());
+
+                if (args.Count < 2)
+                    return null;
+                if (args[0] != "todo")
                     return null;
 
-                switch (args[0])
+                switch (args[1])
                 {
                     case "add-task":
-                        return new TodoCommand() { Operation = EnumOperation.Add,  Title = args[1], IsCompleted = false };
+                        return new TodoCommand() { Operation = EnumOperation.Add,  Title = args[2], IsCompleted = false };
                     case "update-task":
-                        return new TodoCommand() { Operation = EnumOperation.Update, Title = args[1], NewTitle = args[2] };
+                        return new TodoCommand() { Operation = EnumOperation.Update, Title = args[2], NewTitle = args[3] };
                     case "complete-task":
-                        return new TodoCommand() { Operation = EnumOperation.Complete, IsCompleted = true, Title = args[1] };
+                        return new TodoCommand() { Operation = EnumOperation.Complete, IsCompleted = true, Title = args[2] };
                     case "undo-task":
-                        return new TodoCommand() { Operation = EnumOperation.Undo, IsCompleted = false, Title = args[1] };
+                        return new TodoCommand() { Operation = EnumOperation.Undo, IsCompleted = false, Title = args[2] };
                     case "delete-task":
-                        return new TodoCommand() { Operation = EnumOperation.Delete, Title = args[1] };
+                        return new TodoCommand() { Operation = EnumOperation.Delete, Title = args[2] };
                     case "list-task":
                         return new TodoCommand() { Operation = EnumOperation.List };
                     case "list-completed-task":
